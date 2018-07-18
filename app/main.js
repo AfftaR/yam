@@ -1,9 +1,11 @@
 'use strict';
 
 const electron = require('electron');
+const menuTemplate = require('./menu');
 
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
+const Menu = electron.Menu;
 const globalShortcut = electron.globalShortcut;
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -11,16 +13,32 @@ const globalShortcut = electron.globalShortcut;
 let mainWindow;
 let willAppQuit = false;
 
-// console.log(app.getPath('userData') + '/config.json');
-
 const inCurrentDir = appends => 'file://' + __dirname + appends;
 
 const createWindow = () => {
-  mainWindow = new BrowserWindow({width: 1080, height: 700,
-    icon: inCurrentDir('/icons/source_colored_png/256x256.png')});
+  mainWindow = new BrowserWindow({width: 1280, height: 800,
+    icon: inCurrentDir('/icons/source_colored_png/256x256.png'),
+    webPreferences: {nativeWindowOpen: true, affinity: 'main-window'}});
+  Menu.setApplicationMenu(Menu.buildFromTemplate(menuTemplate));
+
   mainWindow.loadURL(inCurrentDir('/index.html'));
-  
+
   // mainWindow.webContents.openDevTools();
+
+  mainWindow.webContents.on('new-window', (event, url, frameName, disposition, options, additionalFeatures) => {
+    event.preventDefault()
+
+    Object.assign(options, {
+      modal: true, parent: mainWindow,
+      width: 600, height: 800,
+      webPreferences: {affinity: 'main-window'}
+    })
+
+    event.newGuest = new BrowserWindow(options)
+    event.newGuest.on('closed', event => {
+      mainWindow.reload()
+    })
+  });
 
   mainWindow.on('close', event => {
     if (willAppQuit) {
@@ -36,7 +54,7 @@ const createWindow = () => {
           mainWindow.hide();
           break;
         default:
-      } 
+      }
     }
   });
 
@@ -50,15 +68,15 @@ const createWindow = () => {
   globalShortcut.register('MediaNextTrack', () => {
     mainWindow.webContents.send('media-next-track');
   });
-  
+
   globalShortcut.register('MediaPreviousTrack', () => {
     mainWindow.webContents.send('media-prev-track');
   });
-  
+
   globalShortcut.register('MediaStop', () => {
     mainWindow.webContents.send('media-stop');
   });
-  
+
   globalShortcut.register('MediaPlayPause', () => {
     mainWindow.webContents.send('media-play-pause');
   });

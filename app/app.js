@@ -1,26 +1,31 @@
-const electron = require('electron');
-const ipc = electron.ipcRenderer;
-const embed = document.getElementById('embed');
+const electron = require('electron')
+const ipc = electron.ipcRenderer
+const webview = document.getElementById('embed')
 
-// disable drop-down yandex menu
-embed.addEventListener('dom-ready', () => {
-  embed.executeJavaScript(`
-    document.querySelector('.tableau').style.display = 'none';
-  `);
-});
+webview.addEventListener('console-message', event => {
+  console.log('webview log', event.message)
+})
 
-ipc.on('media-next-track', () => {
-  embed.executeJavaScript(`externalAPI.next()`);
-});
+webview.addEventListener('dom-ready', event => {
+  const webContents = webview.getWebContents()
 
-ipc.on('media-prev-track', () => {
-  embed.executeJavaScript(`externalAPI.prev()`);
-});
+  webview.addEventListener('new-window', event => {
+    window.open(event.url)
+  })
 
-ipc.on('media-stop', () => {
-  embed.executeJavaScript(`externalAPI.stop()`);
-});
+  ipc.on('media-next-track', e => {
+    webContents.executeJavaScript(`externalAPI.next()`)
+  })
 
-ipc.on('media-play-pause', () => {
-  embed.executeJavaScript(`externalAPI.togglePause()`);
-});
+  ipc.on('media-prev-track', e => {
+    webContents.executeJavaScript(`externalAPI.prev()`)
+  })
+
+  ipc.on('media-stop', e => {
+    webContents.executeJavaScript(`externalAPI.stop()`)
+  })
+
+  ipc.on('media-play-pause', e => {
+    webContents.executeJavaScript(`externalAPI.togglePause()`)
+  })
+})
