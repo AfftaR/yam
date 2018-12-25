@@ -11,7 +11,6 @@ const globalShortcut = electron.globalShortcut;
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
-let willAppQuit = false;
 
 const inCurrentDir = appends => 'file://' + __dirname + appends;
 
@@ -41,20 +40,11 @@ const createWindow = () => {
   });
 
   mainWindow.on('close', event => {
-    if (willAppQuit) {
-      // saveWindowState();
-    } else {
+    if (process.platform === 'darwin') {
       event.preventDefault();
-      switch(process.platform) {
-        case 'win32':
-        case 'linux':
-          mainWindow.minimize();
-          break;
-        case 'darwin':
-          mainWindow.hide();
-          break;
-        default:
-      }
+      mainWindow.hide();
+    } else {
+      app.quit();
     }
   });
 
@@ -62,7 +52,7 @@ const createWindow = () => {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
-    mainWindow = null;
+    // mainWindow = null;
   });
 
   globalShortcut.register('MediaNextTrack', () => {
@@ -84,18 +74,13 @@ const createWindow = () => {
 
 app.on('ready', createWindow);
 
-app.on('window-all-closed', () => {
-  // On OS X it is common for applications and their menu bar
-  // to stay active until the user quits explicitly with Cmd + Q
-  // if (process.platform !== 'darwin') {
-  //   app.quit();
-  // }
-//   globalShortcut.unregisterAll();
-});
-
-app.on('before-quit', () => {
-  willAppQuit = true;
-});
+// app.on('window-all-closed', () => {
+//   // On OS X it is common for applications and their menu bar
+//   // to stay active until the user quits explicitly with Cmd + Q
+//   if (process.platform !== 'darwin') {
+//     app.quit();
+//   }
+// });
 
 // For OSX, show hidden mainWindow when clicking dock icon.
 app.on('activate', event => {
