@@ -35,7 +35,9 @@ const createWindow = () => {
 
     event.newGuest = new BrowserWindow(options)
     event.newGuest.on('closed', event => {
-      mainWindow.reload()
+      setTimeout(() => {
+        mainWindow.reload();
+      }, 1000);
     })
   });
 
