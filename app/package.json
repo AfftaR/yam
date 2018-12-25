@@ -14,7 +14,7 @@
   },
   "homepage": "https://github.com/artemeff/yam#readme",
   "devDependencies": {
-    "electron": "2.0.4",
-    "electron-packager": "12.1.0"
+    "electron": "2.0.16",
+    "electron-packager": "13.0.1"
   }
 }

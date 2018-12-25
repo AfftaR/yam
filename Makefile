@@ -1,5 +1,5 @@
 PACKAGER=./app/node_modules/.bin/electron-packager
-DEFAULT_CMD=$(PACKAGER) ./app YAM --arch=all --electron-version=2.0.4 --out=./build --asar --name=YAM --overwrite
+DEFAULT_CMD=$(PACKAGER) ./app YAM --arch=all --electron-version=2.0.16 --out=./build --asar --name=YAM --overwrite
 
 .PHONY: run build
 
